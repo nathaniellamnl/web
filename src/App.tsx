@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Repo } from './types/Repo';
+import axios from 'axios';
 
-import './App.css';
+const client = axios.create({ baseURL: process.env.API_BASE_URL });
 
 export function App() {
+  const [repos, setRepos] = useState<Repo[]>([]);
+  const [error, setError] = useState<boolean>(false);
+
+  const fetchRepos = useCallback(async () => {
+    const { data } = await client.get<Repo[]>('/repos');
+
+    setRepos(data);
+  }, []);
+
+  useEffect(() => {
+    try {
+      fetchRepos();
+    } catch (err) {
+      setError(true);
+    }
+  }, [fetchRepos]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+     
     </div>
   );
 }
