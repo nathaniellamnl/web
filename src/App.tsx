@@ -93,8 +93,7 @@ export function App() {
       setRepos(
         data.sort(
           (repoA, repoB) =>
-            new Date(repoB.created_at).getTime() -
-            new Date(repoA.created_at).getTime()
+            Date.parse(repoB.created_at) - Date.parse(repoA.created_at)
         )
       );
     } catch (err) {
