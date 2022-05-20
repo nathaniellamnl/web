@@ -17,6 +17,16 @@ const STYLED_DIV = styled.div`
   }
 `;
 
+const STYLED_CONTAINER = styled.div`
+   {
+    margin: 20px 0;
+    margin-bottom: 20px;
+    padding: 30px 50px;
+    text-align: center;
+    border-radius: 4px;
+  }
+`;
+
 export function App() {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [error, setError] = useState<boolean>(false);
@@ -24,6 +34,7 @@ export function App() {
   const [commit, setCommit] = useState<Commit | undefined>();
   const [readme, setReadme] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [callingLocalServer, setCallingLocalServer] = useState<boolean>(false);
 
   const languages = useMemo(() => R.uniq(R.pluck('language', repos)), [repos]);
 
@@ -89,6 +100,7 @@ export function App() {
 
   const fetchRepos = useCallback(async () => {
     try {
+      setCallingLocalServer(true);
       const { data } = await axios.get<Repo[]>('http://localhost:4000/repos');
       setRepos(
         data.sort(
@@ -99,6 +111,7 @@ export function App() {
     } catch (err) {
       setError(true);
     }
+    setCallingLocalServer(false);
   }, []);
 
   useEffect(() => {
@@ -106,7 +119,7 @@ export function App() {
   }, [fetchRepos]);
 
   return (
-    <>
+    <STYLED_CONTAINER>
       <Modal
         title="Repo"
         visible={isModalVisible}
@@ -134,8 +147,13 @@ export function App() {
           </>
         )}
       </Modal>
-      <Table rowKey={'id'} columns={columns} dataSource={repos} />
+      {callingLocalServer ? (
+        <Spin />
+      ) : (
+        <Table rowKey={'id'} columns={columns} dataSource={repos} />
+      )}
+
       {error && <h1>An error has occured on the Server Side!</h1>}
-    </>
+    </STYLED_CONTAINER>
   );
 }
